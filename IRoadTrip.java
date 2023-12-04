@@ -25,14 +25,14 @@ public class IRoadTrip {
         // Read in files
         txtRead(args[0]); // borders.txt
         csvRead(args[1]); // capdist.csv
-        tsvRead(args[2]); // state_name.tsv
+        // TODO: tsvRead(args[2]); // state_name.tsv
     }
 
-    private void txtRead(String fileName) {
-        try (Scanner scan = new Scanner(new File(fileName))) { // Scanner class: https://www.geeksforgeeks.org/different-ways-reading-text-file-java/
+    private void txtRead(String file) {
+        try (Scanner scan = new Scanner(new File(file))) { // Scanner: https://www.geeksforgeeks.org/different-ways-reading-text-file-java/
             while (scan.hasNextLine()) { // As long as a next line exists...
                 String fileLine = scan.nextLine(); // read line by line
-                String[] lineParts = fileLine.split("="); // split when '=' character
+                String[] lineParts = fileLine.split("="); // REGEX: split at '='
                 String countryName = lineParts[0].trim(); // before '=' is country name
 
                 if (!countryGraph.containsKey(countryName)) { // If the country is not already in our graph,
@@ -40,10 +40,10 @@ public class IRoadTrip {
                 }
 
                 if (lineParts.length > 1) { // If the country has neighbors
-                    String[] neighborArr = lineParts[1].split(";"); // Create an array of neighboring countries
+                    String[] neighborArr = lineParts[1].split(";"); // Create an array of neighboring countries; REGEX: split at ";"
 
                     for (String neighboringCountry : neighborArr) {
-                        String[] neighborStats = neighboringCountry.trim().split(" "); // Split neighbor name from border distance
+                        String[] neighborStats = neighboringCountry.trim().split(" "); // REGEX: split at " "; Neighbor name and border distance
                         countryGraph.get(countryName).put(neighborStats[0], 0); // Default border distance 0
                     }
                 }
@@ -55,12 +55,27 @@ public class IRoadTrip {
     }
 
     // TODO: Read in .csv file
-    private void csvRead(String fileName) {
+    private void csvRead(String file) {
+        try (Scanner scan = new Scanner(new File(file))) { // Scanner: https://www.youtube.com/watch?v=rj6vyIn90zk
+            if (scan.hasNextLine()) { // Read in next line if exists
+                scan.nextLine();
+            }
 
-    }
+            while (scan.hasNextLine()) { // As long as a next line exists...
+                String fileLine = scan.nextLine();
+                String[] lineParts = fileLine.split(","); // REGEX: Split at ","
+                // TODO: Build a getCountry method
+                String countryA = getCountry(lineParts[1].trim()); // Unique ID for country A
+                String countryB = getCountry(lineParts[3].trim()); // Unique ID for country B
+                int borderDistance = Integer.parseInt(lineParts[4].trim()); //
+
+
+
+            }
+        }
 
     // TODO: Read in .tsv file
-    private void tsvRead(String fileName) {
+    private void tsvRead(String file) {
 
     }
 
