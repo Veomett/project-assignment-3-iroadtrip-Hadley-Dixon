@@ -3,8 +3,10 @@
 import java.util.*;
 import java.io.*;
 
+// TODO: Javadoc
 public class IRoadTrip {
 
+    // Graph structure: https://www.geeksforgeeks.org/implementing-generic-graph-in-java/
     private Map<String, Map<String, Integer>> countryGraph; // Graph of adjacent countries
     private Map<String, String> countryNameMap; // Map of country names
 
@@ -25,7 +27,7 @@ public class IRoadTrip {
         // Read in files
         txtRead(args[0]); // borders.txt
         csvRead(args[1]); // capdist.csv
-        // TODO: tsvRead(args[2]); // state_name.tsv
+        tsvRead(args[2]); // state_name.tsv
     }
 
     // TODO: Javadoc
@@ -126,6 +128,23 @@ public class IRoadTrip {
     // TODO: Javadoc
     // Helper function to navigate different references to the same country without hardcode
     private boolean countryChecker(String country) {
+        // Is input country in countryGraph
+        for (String validCountry : countryGraph.keySet()) {
+            // Check if input country is a substring of a valid country in graph
+            if (validCountry.equals(country) || validCountry.contains(country) || country.contains(validCountry)) {
+                return true;
+            }
+        }
+
+        // Is input country in countryNameMap
+        for (String encodedName : countryNameMap.keySet()) {
+            // Check if input country is a substring of a valid encoded country in map
+            if (encodedName.equals(country)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     // TODO: Javadoc
@@ -176,11 +195,13 @@ public class IRoadTrip {
             }
             scan.close();
         }
+    }
 
-        public static void main (String[] args){
-            IRoadTrip a3 = new IRoadTrip(args);
-            a3.acceptUserInput();
-        }
+    // TODO: Javadoc
+    // Main code provided
+    public static void main (String[] args){
+        IRoadTrip a3 = new IRoadTrip(args);
+        a3.acceptUserInput();
     }
 }
 
