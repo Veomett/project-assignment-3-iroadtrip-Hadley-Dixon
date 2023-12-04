@@ -22,7 +22,24 @@ public class IRoadTrip {
         adjacencyList = new HashMap<>(); // Initialize adjacent country graph
         stateNameMap = new HashMap<>(); // Initialize map of country names
 
-        // TODO: Read in files
+        // Read in files
+        txtRead(args[0]); // borders.txt
+        csvRead(args[1]); // capdist.csv
+        tsvRead(args[2]); // state_name.tsv
+    }
+
+    // TODO: Read in .txt file
+    private void txtRead(String filename) {
+
+    }
+
+    // TODO: Read in .csv file
+    private void csvRead(String filename) {
+
+    }
+
+    // TODO: Read in .tsv file
+    private void tsvRead(String filename) {
 
     }
 
@@ -47,7 +64,6 @@ public class IRoadTrip {
 
     public static void main(String[] args) {
         IRoadTrip a3 = new IRoadTrip(args);
-
         a3.acceptUserInput();
     }
 
