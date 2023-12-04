@@ -9,7 +9,7 @@ public class IRoadTrip {
     private Map<String, String> countryNameMap; // Map of country names
 
 
-
+    // TODO: Javadoc
     public IRoadTrip (String [] args) {
         // Handle when invalid input
         if (args.length != 3) {
@@ -28,8 +28,9 @@ public class IRoadTrip {
         // TODO: tsvRead(args[2]); // state_name.tsv
     }
 
+    // TODO: Javadoc
     private void txtRead(String file) {
-        try (Scanner scan = new Scanner(new File(file))) { // Scanner: https://www.geeksforgeeks.org/different-ways-reading-text-file-java/
+        try (Scanner scan = new Scanner(new File(file))) { // Scanner on .txt: https://www.geeksforgeeks.org/different-ways-reading-text-file-java/
             while (scan.hasNextLine()) { // As long as a next line exists...
                 String fileLine = scan.nextLine(); // read line by line
                 String[] lineParts = fileLine.split("="); // REGEX: split at '='
@@ -54,9 +55,10 @@ public class IRoadTrip {
         }
     }
 
+    // TODO: Javadoc
     // TODO: Read in .csv file
     private void csvRead(String file) {
-        try (Scanner scan = new Scanner(new File(file))) { // Scanner: https://www.youtube.com/watch?v=rj6vyIn90zk
+        try (Scanner scan = new Scanner(new File(file))) { // Scanner on .csv: https://www.youtube.com/watch?v=rj6vyIn90zk
             if (scan.hasNextLine()) { // Read in next line if exists
                 scan.nextLine();
             }
@@ -67,16 +69,42 @@ public class IRoadTrip {
                 // TODO: Build a getCountry method
                 String countryA = getCountry(lineParts[1].trim()); // Unique ID for country A
                 String countryB = getCountry(lineParts[3].trim()); // Unique ID for country B
-                int borderDistance = Integer.parseInt(lineParts[4].trim()); //
+                int capitalDistance = Integer.parseInt(lineParts[5].trim()); // Distance between capitals of country A and country B in km
 
-
-
+                // If country A and country B are adjacent...
+                if (countryGraph.containsKey(countryA) && countryGraph.get(countryA).containsKey(countryB)) {
+                    // Add capital distances to the respective (undirected) graph
+                    countryGraph.get(countryA).put(countryB, capitalDistance);
+                    countryGraph.get(countryB).put(countryA, capitalDistance);
+                }
             }
+        } catch (Exception exception) {
+            System.err.println(exception.getMessage());
+            System.exit(1);
         }
+    }
+
+    // TODO: Javadoc
+    // Helper method to get unique country ID, used in
+    private String getCountry(String country) {
+        if (countryNameMap.containsKey(country)) {
+            return countryNameMap.get(country);
+        } return null;
+    }
 
     // TODO: Read in .tsv file
     private void tsvRead(String file) {
+        try (Scanner scan = new Scanner(new File(file))) { // Scanner .tsv: https://codepal.ai/code-generator/query/0pkdvNiV/java-program-read-student-information
+            if (scan.hasNextLine()) { // Read in next line if exists
+                scan.nextLine();
+            }
 
+            while (scan.hasNextLine()) { // As long as a next line exists...
+                String fileLine = scan.nextLine();
+                String[] lineParts = fileLine.split("\t"); // REGEX: Split at tab
+                
+            }
+        }
     }
 
 
