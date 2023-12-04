@@ -1,10 +1,29 @@
-import java.util.List;
+// Assignment 3 - International Road Trip; Hadley Dixon; CS 245; Prof. Veomett 03
+
+import java.util.*;
+import java.io.*;
 
 public class IRoadTrip {
 
+    private Map<String, Map<String, Integer>> adjacencyList; // Graph of adjacent countries
+    private Map<String, String> stateNameMap; // Map of country names
+
+
 
     public IRoadTrip (String [] args) {
-        // Replace with your code
+        // Handle when invalid input
+        if (args.length != 3) {
+            System.err.println("Invalid input");
+            System.err.println("Input: 'java IRoadTrip borders.txt capdist.csv state_name.tsv'");
+            System.exit(1);
+        }
+
+        // Valid input
+        adjacencyList = new HashMap<>(); // Initialize adjacent country graph
+        stateNameMap = new HashMap<>(); // Initialize map of country names
+
+        // TODO: Read in files
+
     }
 
 
