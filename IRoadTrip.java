@@ -192,7 +192,7 @@ public class IRoadTrip {
                         for (String country : travelPath) { // Step through countries along path
                             System.out.println("* " + country);
                         }
-                    } else { // No valid travel path bewteen countries
+                    } else { // No valid travel path between countries
                         System.out.println("No path found between " + country1 + " and " + country2);
                     }*/
                 }
