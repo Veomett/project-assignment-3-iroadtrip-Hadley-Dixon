@@ -13,6 +13,8 @@ public class IRoadTrip {
 
     // TODO: Javadoc
     public IRoadTrip (String [] args) {
+        // TODO: TEST
+        System.out.println(args.length);
         // Handle when invalid input
         if (args.length != 3) {
             System.err.println("Invalid input");
@@ -182,8 +184,8 @@ public class IRoadTrip {
                         continue;
                     }
 
-                    // Find path between 2 valid countries
-                    List<String> travelPath = findPath(country1, country2);
+                    // TODO: Find path between 2 valid countries
+                    /*List<String> travelPath = findPath(country1, country2);
 
                     if (!travelPath.isEmpty()) { // Valid travel path between countries
                         System.out.println("Route from " + country1 + " to " + country2 + ":");
@@ -192,7 +194,7 @@ public class IRoadTrip {
                         }
                     } else { // No valid travel path bewteen countries
                         System.out.println("No path found between " + country1 + " and " + country2);
-                    }
+                    }*/
                 }
             }
             scan.close();
