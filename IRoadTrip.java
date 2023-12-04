@@ -92,7 +92,7 @@ public class IRoadTrip {
         } return null;
     }
 
-    // TODO: Read in .tsv file
+    // TODO: Javadoc
     private void tsvRead(String file) {
         try (Scanner scan = new Scanner(new File(file))) { // Scanner .tsv: https://codepal.ai/code-generator/query/0pkdvNiV/java-program-read-student-information
             if (scan.hasNextLine()) { // Read in next line if exists
@@ -102,8 +102,13 @@ public class IRoadTrip {
             while (scan.hasNextLine()) { // As long as a next line exists...
                 String fileLine = scan.nextLine();
                 String[] lineParts = fileLine.split("\t"); // REGEX: Split at tab
-                
+                String encodedName = lineParts[1].trim(); // The encoded name for a country (eg. JAM)
+                String decodedName = lineParts[2].trim(); // The decoded name for a country (eg. Jamaica)
+                countryNameMap.put(encodedName, decodedName);
             }
+        } catch (Exception exception) {
+            System.err.println(exception.getMessage());
+            System.exit(1);
         }
     }
 
