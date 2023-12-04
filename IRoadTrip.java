@@ -112,7 +112,6 @@ public class IRoadTrip {
         }
     }
 
-
     public int getDistance (String country1, String country2) {
         // Replace with your code
         return -1;
@@ -124,17 +123,64 @@ public class IRoadTrip {
         return null;
     }
 
+    // TODO: Javadoc
+    // Helper function to navigate different references to the same country without hardcode
+    private boolean countryChecker(String country) {
+    }
 
+    // TODO: Javadoc
     public void acceptUserInput() {
-        // Replace with your code
-        System.out.println("IRoadTrip - skeleton");
+        Scanner scan = new Scanner(System.in); // Scanner for user input: https://www.theserverside.com/tutorial/Your-top-Java-user-input-strategies
+
+        boolean exit = false;
+
+        while (!exit) {
+            System.out.print("Enter the name of the first country (type EXIT to quit): ");
+            String country1 = scan.nextLine().trim();
+
+            if (country1.equalsIgnoreCase("EXIT")) {
+                exit = true;
+            } else {
+                boolean validCountry1 = countryChecker(country1);
+
+                if (!validCountry1) {
+                    System.out.println("Invalid country name. Please enter a valid country name.");
+                    continue;
+                }
+
+                System.out.print("Enter the name of the second country (type EXIT to quit): ");
+                String country2 = scan.nextLine().trim();
+
+                if (country2.equalsIgnoreCase("EXIT")) {
+                    exit = true;
+                } else {
+                    boolean validCountry2 = countryChecker(country2);
+
+                    if (!validCountry2) {
+                        System.out.println("Invalid country name. Please enter a valid country name.");
+                        continue;
+                    }
+
+                    // Find path between 2 valid countries
+                    List<String> travelPath = findPath(country1, country2);
+
+                    if (!travelPath.isEmpty()) { // Valid travel path between countries
+                        System.out.println("Route from " + country1 + " to " + country2 + ":");
+                        for (String country : travelPath) { // Step through countries along path
+                            System.out.println("* " + country);
+                        }
+                    } else { // No valid travel path bewteen countries
+                        System.out.println("No path found between " + country1 + " and " + country2);
+                    }
+                }
+            }
+            scan.close();
+        }
+
+        public static void main (String[] args){
+            IRoadTrip a3 = new IRoadTrip(args);
+            a3.acceptUserInput();
+        }
     }
-
-
-    public static void main(String[] args) {
-        IRoadTrip a3 = new IRoadTrip(args);
-        a3.acceptUserInput();
-    }
-
 }
 
