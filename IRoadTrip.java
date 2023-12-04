@@ -1,4 +1,4 @@
-// Assignment 3 - International Road Trip; Hadley Dixon; CS 245; Prof. Veomett 03
+// Project 3 - International Road Trip; Hadley Dixon; Prof. Veomett; CS 245 03
 
 import java.util.*;
 import java.io.*;
@@ -58,7 +58,6 @@ public class IRoadTrip {
     }
 
     // TODO: Javadoc
-    // TODO: Read in .csv file
     private void csvRead(String file) {
         try (Scanner scan = new Scanner(new File(file))) { // Scanner on .csv: https://www.youtube.com/watch?v=rj6vyIn90zk
             if (scan.hasNextLine()) { // Read in next line if exists
@@ -68,7 +67,6 @@ public class IRoadTrip {
             while (scan.hasNextLine()) { // As long as a next line exists...
                 String fileLine = scan.nextLine();
                 String[] lineParts = fileLine.split(","); // REGEX: Split at ","
-                // TODO: Build a getCountry method
                 String countryA = getCountry(lineParts[1].trim()); // Unique ID for country A
                 String countryB = getCountry(lineParts[3].trim()); // Unique ID for country B
                 int capitalDistance = Integer.parseInt(lineParts[5].trim()); // Distance between capitals of country A and country B in km
@@ -114,12 +112,16 @@ public class IRoadTrip {
         }
     }
 
+    // TODO: getDistance
+    // TODO: Javadoc
     public int getDistance (String country1, String country2) {
         // Replace with your code
         return -1;
     }
 
 
+    // TODO: findPath
+    // TODO: Javadoc
     public List<String> findPath (String country1, String country2) {
         // Replace with your code
         return null;
