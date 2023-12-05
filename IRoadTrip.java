@@ -13,8 +13,8 @@ public class IRoadTrip {
 
     // TODO: Javadoc
     public IRoadTrip (String [] args) {
-        // TODO: TEST
-        System.out.println(args.length);
+        // Test: System.out.println(args.length);
+
         // Handle when invalid input
         if (args.length != 3) {
             System.err.println("Invalid input");
