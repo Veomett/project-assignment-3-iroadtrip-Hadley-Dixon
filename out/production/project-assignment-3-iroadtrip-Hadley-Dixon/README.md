@@ -22,3 +22,5 @@ Change the java source code, but do not change the data files. See Canvas for as
 - Then you read in .tsv so that if a country has an end date that ended in 2020, I put that country into a hashmap with the country name and the country code. 
 - Then when I read in the .csv file, I start putting in the distances to the graph (weights of the edges). 
 - Use the hashmap of country name to country code to see if the connection is something in my graph, and if so where do i put it. is US and canada an edge in my graph?
+
+- Challenges I encountered: South Sudan, Kosovo, ireland, UK
