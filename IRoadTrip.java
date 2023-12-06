@@ -35,9 +35,9 @@ public class IRoadTrip {
         try (Scanner scan = new Scanner(new File(file))) { // See source (2) in README.md
             while (scan.hasNextLine()) { // As long as a next line exists...
                 String fileLine = scan.nextLine(); // read line by line
-                String[] lineParts = fileLine.split("="); // REGEX: split at '='
+                String[] lineParts = fileLine.split("= "); // REGEX: split at '=', limited by 2 parts
                 String countryName = lineParts[0].trim(); // before '=' is country name
-
+                System.out.println(countryName); // TEST
                 if (!countryGraph.containsKey(countryName)) { // If the country is not already in our graph,
                     countryGraph.put(countryName, new HashMap<>()); // Add country to the graph
                 }
@@ -46,11 +46,12 @@ public class IRoadTrip {
                     String[] neighborArr = lineParts[1].split(";"); // Create an array of neighboring countries; REGEX: split at ";"
 
                     for (String neighboringCountry : neighborArr) {
-                        String[] neighborStats = neighboringCountry.trim().split(" "); // REGEX: split at " "; Neighbor name and border distance
-                        countryGraph.get(countryName).put(neighborStats[0], 0); // Default border distance 0
+                        String[] neighborStats = neighboringCountry.trim().split("\\s+(?=\\d)", 2); // REGEX: split at the first occurrence of digits; Neighbor name and capital distance
+                        countryGraph.get(countryName).put(neighborStats[0], 0); // Default capital distance 0
                     }
                 }
             }
+            System.out.println(countryGraph);
         } catch (Exception exception) { // See source (3) in README.md
             System.err.println(exception.getMessage());
             System.exit(1);
