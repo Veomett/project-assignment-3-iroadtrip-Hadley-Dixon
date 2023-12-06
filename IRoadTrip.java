@@ -25,46 +25,76 @@ public class IRoadTrip {
         countryNameMap = new HashMap<>(); // Initialize map of country names
 
         // Read in files
-        txtRead(args[0]); // borders.txt
         tsvRead(args[2]); // state_name.tsv
-        csvRead(args[1]); // capdist.csv
-
-
-
+        txtRead(args[0]); // borders.txt
+        // TODO: csvRead(args[1]); // capdist.csv
     }
 
     // TODO: Javadoc
-    // Creates a graph of all the countries in borders.txt and their associated adjacent countries
-    private void txtRead(String file) {
-        try (Scanner scan = new Scanner(new File(file))) { // See source (2) in README.md
-            while (scan.hasNextLine()) { // As long as a next line exists...
-                String fileLine = scan.nextLine(); // read line by line
-                String[] lineParts = fileLine.split("= "); // REGEX: split at '=', limited by 2 parts
-                String countryName = lineParts[0].trim(); // before '=' is country name
-                if (!countryGraph.containsKey(countryName)) { // If the country is not already in our graph,
-                    countryGraph.put(countryName, new HashMap<>()); // Add country to the graph
-                }
-
-                if (lineParts.length > 1) { // If the country has neighbors
-                    String[] neighborArr = lineParts[1].split(";"); // Create an array of neighboring countries; REGEX: split at ";"
-
-                    for (String neighboringCountry : neighborArr) {
-                        String[] neighborStats = neighboringCountry.trim().split("\\s+(?=\\d)", 2); // REGEX: split at the first occurrence of digits; Neighbor name and capital distance
-                        countryGraph.get(countryName).put(neighborStats[0], 0); // Default capital distance 0
-                    }
-                }
-            }
-
-            System.out.println("Country Graph: " + countryGraph); // TEST
-
-        } catch (Exception exception) { // See source (3) in README.md
-            System.err.println(exception.getMessage());
-            System.exit(1);
+    // Helper function to navigate different references to the same country
+    private String transform(String inputCountry) {
+        if (Objects.equals(inputCountry, "Surinam")) {
+            return "Suriname";
+        } else if (Objects.equals(inputCountry, "Bosnia-Herzegovina")) {
+            return "Bosnia and Herzegovina";
+        } else if (Objects.equals(inputCountry, "Burkina Faso (Upper Volta)")) {
+            return "Burkina Faso";
+        } else if (Objects.equals(inputCountry, "United States of America")) {
+            return "United States";
+        } else if (Objects.equals(inputCountry, "Myanmar (Burma)")) {
+            return "Burma";
+        } else if (Objects.equals(inputCountry, "Cape Verde")) {
+            return "Cabo Verde";
+        } else if (Objects.equals(inputCountry, "Cambodia (Kampuchea)")) {
+            return "Cambodia";
+        } else if (Objects.equals(inputCountry, "Congo, Democratic Republic of (Zaire)")) {
+            return "Congo, Democratic Republic of the";
+        } else if (Objects.equals(inputCountry, "Congo")) {
+            return "Congo, Republic of the";
+        } else if (Objects.equals(inputCountry, "Czech Republic")) {
+            return "Czechia";
+        } else if (Objects.equals(inputCountry, "Swaziland")) {
+            return "Eswatini";
+        } else if (Objects.equals(inputCountry, "The Gambia") || Objects.equals(inputCountry, "Gambia")) {
+            return "Gabon";
+        } else if (Objects.equals(inputCountry, "German Federal Republic")) {
+            return "Germany";
+        } else if (Objects.equals(inputCountry, "Iran (Persia)")) {
+            return "Iran";
+        } else if (Objects.equals(inputCountry, "(Italy/Sardinia")) {
+            return "Italy";
+        } else if (Objects.equals(inputCountry, "Korea, People's Republic of")) {
+            return "Korea, North";
+        } else if (Objects.equals(inputCountry, "Korea, Republic of")) {
+            return "Korea, South";
+        } else if (Objects.equals(inputCountry, "Kyrgyz Republic")) {
+            return "Kyrgyzstan";
+        } else if (Objects.equals(inputCountry, "Macedonia (Former Yugoslav Republic of)")) {
+            return "North Macedonia";
+        } else if (Objects.equals(inputCountry, "Cote D’Ivoire")) {
+            return "Cote d'Ivoire";
+        } else if (Objects.equals(inputCountry, "Rumania")) {
+            return "Romania";
+        } else if (Objects.equals(inputCountry, "Russia (Soviet Union)")) {
+            return "Russia";
+        } else if (Objects.equals(inputCountry, "Tanzania/Tanganyika")) {
+            return "Tanzania";
+        } else if (Objects.equals(inputCountry, "East Timor")) {
+            return "Timor-Leste";
+        } else if (Objects.equals(inputCountry, "Turkey (Ottoman Empire)")) {
+            return "Turkey (Turkiye)";
+        } else if (Objects.equals(inputCountry, "UAE")) {
+            return "Turkey (United Arab Emirates)";
+        } else if (Objects.equals(inputCountry, "Vietnam, Democratic Republic of")) {
+            return "Vietnam";
+        } else if (Objects.equals(inputCountry, "Yemen (Arab Republic of Yemen)")) {
+            return "Yemen";
         }
+        return inputCountry;
     }
 
     // TODO: Javadoc
-    // Creates a map of country names and their unique 3-letter IDs corresponding to 2020
+    // Creates a map of country names and their unique 3-letter IDs corresponding to 2020, but only if the country is present in both state_name,csv and borders.txt (that way we can identify the 3-letter unique ID for capdist application, and not waste time
     private void tsvRead(String file) {
         try (Scanner scan = new Scanner(new File(file))) { // See source (5) in README.md
             if (scan.hasNextLine()) { // Read in next line if exists
@@ -77,7 +107,9 @@ public class IRoadTrip {
                 if (lineParts.length == 5 && Objects.equals(lineParts[4], "2020-12-31")) {
                     String encodedName = lineParts[1].trim(); // The encoded name for a country (eg. JAM)
                     String decodedName = lineParts[2].trim(); // The decoded name for a country (eg. Jamaica)
-                    countryNameMap.put(encodedName, decodedName);
+                    String transformedDecodedName = transform(decodedName);
+                    countryNameMap.put(transformedDecodedName, encodedName);
+
                 }
             }
 
@@ -90,6 +122,47 @@ public class IRoadTrip {
     }
 
     // TODO: Javadoc
+    // Creates a graph of the countries in borders.txt (which we have 2020 3-letter ID from in state_name) and their associated adjacent countries
+    private void txtRead(String file) {
+        try (Scanner scan = new Scanner(new File(file))) { // See source (2) in README.md
+            while (scan.hasNextLine()) { // As long as a next line exists...
+                String fileLine = scan.nextLine(); // read line by line
+                String[] lineParts = fileLine.split("= "); // REGEX: split at '=', limited by 2 parts
+                String countryName = lineParts[0].trim(); // before '=' is country name
+                if (!countryGraph.containsKey(countryName) && countryNameMap.containsKey(countryName)) { // If the country is not already in our graph, and it has a 3-letter ID tag
+                    countryGraph.put(countryName, new HashMap<>()); // Add country to the graph
+
+                    if (lineParts.length > 1) { // If the country has neighbors
+                        String[] neighborArr = lineParts[1].split(";"); // Create an array of neighboring countries; REGEX: split at ";"
+
+                        for (String neighboringCountry : neighborArr) {
+                            String[] neighborStats = neighboringCountry.trim().split("\\s+(?=\\d)", 2); // REGEX: split at the first occurrence of digits; Neighbor name and capital distance
+                            countryGraph.get(countryName).put(neighborStats[0], 0); // Default capital distance 0
+                        }
+                    }
+                }
+            }
+
+            System.out.println("Country Graph: " + countryGraph); // TEST
+
+        } catch (Exception exception) { // See source (3) in README.md
+            System.err.println(exception.getMessage());
+            System.exit(1);
+        }
+    }
+
+
+
+
+    // TODO: RELEVANCE??? TODO: Javadoc
+    // Helper method to get a country's unique 3-letter ID
+    private String getCountry(String country) {
+        if (countryNameMap.containsKey(country)) {
+            return countryNameMap.get(country);
+        } return null;
+    }
+
+    /*// TODO: Javadoc
     private void csvRead(String file) {
         try (Scanner scan = new Scanner(new File(file))) { // See source (4) in README.md
             if (scan.hasNextLine()) { // Read in next line if exists
@@ -103,31 +176,22 @@ public class IRoadTrip {
                 String countryB = getCountry(lineParts[3].trim()); // Unique ID for country B
                 int capitalDistance = Integer.parseInt(lineParts[5].trim()); // Distance between capitals of country A and country B in km
 
-
-                System.out.println("countryA: " + countryA);
-                System.out.println("countryB: " + countryB);
-                System.out.println("distance: " + capitalDistance);
-
                 // If country A and country B are non-null, valid names, and adjacent...
+
                 if (countryA != null && countryB != null) {
-                    System.out.println("countryA in graph: " + countryChecker(countryA));
-                    System.out.println("countryB in graph: " + countryChecker(countryB));
+                    System.out.println("countryA: " + countryA);
+                    System.out.println("countryB: " + countryB);
+                    System.out.println("countryA in ######### GRAPH: " + countryChecker(countryA));
+                    System.out.println("countryB in ######### GRAPH: " + countryChecker(countryB));
+                    System.out.println("distance: " + capitalDistance);
                     if (countryChecker(countryA) != null && countryChecker(countryB) != null) {
                         if (countryGraph.containsKey(countryA) && countryGraph.get(countryA).containsKey(countryB)) {
-                            // Add capital distances to the respective (undirected) graph
-                            //System.out.println("START");
+                            // Add capital distances to the respective graph
                             countryGraph.get(countryA).put(countryB, capitalDistance);
-                            //System.out.println("FIRST_GRAB");
-                            // TODO: I try to get Czech republic node in countryGraph, and assign 162 to the distance between Austria and Czech republic, but it only exists as Czechia in my graph
-                            countryGraph.get(countryB).put(countryA, capitalDistance); // TODO: ERROR
-                            //System.out.println("SECOND_GRAB");
-
+                            countryGraph.get(countryB).put(countryA, capitalDistance);
                         }
                     }
                 }
-
-                // System.out.println("END");
-                // System.out.println();
             }
 
             System.out.println("Country graph with distances now: " + countryGraph);
@@ -136,15 +200,7 @@ public class IRoadTrip {
             System.err.println(exception.getMessage());
             System.exit(1);
         }
-    }
-
-    // TODO: Javadoc
-    // Helper method to get a country's unique 3-letter ID
-    private String getCountry(String country) {
-        if (countryNameMap.containsKey(country)) {
-            return countryNameMap.get(country);
-        } return null;
-    }
+    }*/
 
     // TODO: getDistance
     // TODO: Javadoc
@@ -161,11 +217,8 @@ public class IRoadTrip {
         return null;
     }
 
-    // TODO: Javadoc
-    // Helper function to navigate different references to the same country without hardcode
-    private String countryChecker(String country) {
 
-        // Iterate through all valid country names (keys) in graph
+        /*// Iterate through all valid country names (keys) in graph
         for (String validCountry : countryGraph.keySet()) {
             // Check if the input country is an exact match or a substring of a valid country in the graph
             if (validCountry.equals(country)) {
@@ -174,7 +227,37 @@ public class IRoadTrip {
             } else if (Objects.equals(country, "Dominican Republic")) { // Edge case
                 return "Dominican Republic";
             } else if (validCountry.contains(country) || country.contains(validCountry)) {
-                return validCountry;
+                return validCountry; // TODO: MIGHT CAUSE ERRORS
+            } else if (Objects.equals(country, "Congo, Democratic Republic of (Zaire)")) { // Edge case
+                return "Congo, Democratic Republic of the";
+            } else if (Objects.equals(country, "East Timor")) { // Edge case
+                return "Timor-Leste";
+            } else if (Objects.equals(country, "Korea, Republic of")) { // Edge case
+                return "Korea, South";
+            } else if (Objects.equals(country, "Korea, People's Republic of")) { // Edge case
+                return "Korea, North";
+            } else if (Objects.equals(country, "Kyrgyz Republic")) { // Edge case
+                return "Kyrgyzstan";
+            } else if (Objects.equals(country, "Turkey (Ottoman Empire)")) { // Edge case
+                return "Turkey (Turkiye)";
+            } else if (Objects.equals(country, "Swaziland")) { // Edge case
+                return "Eswatini";
+            } else if (Objects.equals(country, "Cote D’Ivoire")) { // Edge case
+                return "Cote d'Ivoire";
+            } else if (Objects.equals(country, "Cape Verde")) { // Edge case
+                return "Cabo Verde";
+            } else if (Objects.equals(country, "Rumania")) { // Edge case
+                return "Romania";
+            } else if (Objects.equals(country, "Bosnia-Herzegovina")) { // Edge case
+                return "Bosnia and Herzegovina";
+            } else if (Objects.equals(country, "Macedonia (Former Yugoslav Republic of)")) { // Edge case
+                return "North Macedonia";
+            } else if (Objects.equals(country, "Czechia")) { // Edge case
+                return "Czech Republic";
+            } else if (Objects.equals(country, "German Federal Republic")) { // Edge case
+                return "Germany";
+            } else if (Objects.equals(country, "UK")) { // Edge case
+                return "United Kingdom";
             }
         }
 
@@ -188,57 +271,7 @@ public class IRoadTrip {
         }
 
         //System.out.println("FALSE"); // TEST
-        return null;
-    }
 
-    /*// TODO: Javadoc
-    public void acceptUserInput() {
-        Scanner scan = new Scanner(System.in); // See source (6) in README.md
-
-        boolean exit = false;
-
-        while (!exit) {
-            System.out.print("Enter the name of the first country (type EXIT to quit): ");
-            String country1 = scan.nextLine().trim();
-
-            if (country1.equalsIgnoreCase("EXIT")) {
-                exit = true;
-            } else {
-                boolean validCountry1 = countryChecker(country1);
-
-                if (!validCountry1) {
-                    System.out.println("Invalid country name. Please enter a valid country name.");
-                    continue;
-                }
-
-                System.out.print("Enter the name of the second country (type EXIT to quit): ");
-                String country2 = scan.nextLine().trim();
-
-                if (country2.equalsIgnoreCase("EXIT")) {
-                    exit = true;
-                } else {
-                    boolean validCountry2 = countryChecker(country2);
-
-                    if (!validCountry2) {
-                        System.out.println("Invalid country name. Please enter a valid country name.");
-                        continue;
-                    }
-
-                    // TODO: Find path between 2 valid countries
-                    *//*List<String> travelPath = findPath(country1, country2);
-
-                    if (!travelPath.isEmpty()) { // Valid travel path between countries
-                        System.out.println("Route from " + country1 + " to " + country2 + ":");
-                        for (String country : travelPath) { // Step through countries along path
-                            System.out.println("* " + country);
-                        }
-                    } else { // No valid travel path between countries
-                        System.out.println("No path found between " + country1 + " and " + country2);
-                    }*//*
-                }
-            }
-            scan.close();
-        }
     }*/
 
     // TODO: Javadoc
