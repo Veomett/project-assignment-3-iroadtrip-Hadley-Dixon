@@ -115,8 +115,6 @@ public class IRoadTrip {
                 }
             }
 
-            System.out.println("Country Name Map: " + countryNameMap); // TEST
-
         } catch (Exception exception) {
             System.err.println(exception.getMessage());
             System.exit(1);
@@ -175,7 +173,7 @@ public class IRoadTrip {
                 String[] lineParts = fileLine.split(","); // REGEX: Split at ","
                 String idCountryA = lineParts[1].trim(); // Unique ID for country A
                 String idCountryB = lineParts[3].trim(); // Unique ID for country B
-                int capitalDistance = Integer.parseInt(lineParts[5].trim()); // Distance between capitals of country A and country B in km
+                int capitalDistance = Integer.parseInt(lineParts[4].trim()); // Distance between capitals of country A and country B in km
 
                 if (idCountryA.equals("UK")) {
                     idCountryA = "UKG";
@@ -193,7 +191,6 @@ public class IRoadTrip {
                     countryGraph.get(countryB).put(countryA, capitalDistance);
                 }
             }
-            System.out.println("Country graph with distances now: " + countryGraph);
 
         } catch (Exception exception) {
             System.err.println(exception.getMessage());
@@ -201,22 +198,165 @@ public class IRoadTrip {
         }
     }
 
-    // TODO: getDistance
     // TODO: Javadoc
-    public int getDistance (String country1, String country2) {
-        // Replace with your code
-        return -1;
+    // TODO: getDistance
+    public int getDistance(String country1, String country2) {
+        // Implement Dijkstra's algorithm here
+        if (!countryGraph.containsKey(country1) || !countryGraph.containsKey(country2)) {
+            return -1; // Either country does not exist in the graph
+        }
+
+        Map<String, Integer> distances = new HashMap<>();
+        Set<String> visited = new HashSet<>();
+        PriorityQueue<String> priorityQueue = new PriorityQueue<>(Comparator.comparingInt(distances::get));
+
+        for (String country : countryGraph.keySet()) {
+            distances.put(country, Integer.MAX_VALUE);
+        }
+
+        distances.put(country1, 0);
+        priorityQueue.add(country1);
+
+        while (!priorityQueue.isEmpty()) {
+            String currentCountry = priorityQueue.poll();
+            if (visited.contains(currentCountry)) {
+                continue;
+            }
+
+            visited.add(currentCountry);
+
+            for (Map.Entry<String, Integer> neighbor : countryGraph.get(currentCountry).entrySet()) {
+                String neighborCountry = neighbor.getKey();
+                int newDistance = distances.get(currentCountry) + neighbor.getValue();
+                if (newDistance < distances.get(neighborCountry)) {
+                    distances.put(neighborCountry, newDistance);
+                    priorityQueue.add(neighborCountry);
+                }
+            }
+        }
+
+        return distances.getOrDefault(country2, -1);
     }
 
     // TODO: findPath
     // TODO: Javadoc
-    public List<String> findPath (String country1, String country2) {
-        // Replace with your code
-        return null;
+    public List<String> findPath(String country1, String country2) {
+        // Implement Dijkstra's algorithm here
+        if (!countryGraph.containsKey(country1) || !countryGraph.containsKey(country2)) {
+            return Collections.emptyList(); // Either country does not exist in the graph
+        }
+
+        Map<String, Integer> distances = new HashMap<>();
+        Map<String, String> previous = new HashMap<>();
+        Set<String> visited = new HashSet<>();
+        PriorityQueue<String> priorityQueue = new PriorityQueue<>(Comparator.comparingInt(distances::get));
+
+        for (String country : countryGraph.keySet()) {
+            distances.put(country, Integer.MAX_VALUE);
+        }
+
+        distances.put(country1, 0);
+        priorityQueue.add(country1);
+
+        while (!priorityQueue.isEmpty()) {
+            String currentCountry = priorityQueue.poll();
+            if (visited.contains(currentCountry)) {
+                continue;
+            }
+
+            visited.add(currentCountry);
+
+            for (Map.Entry<String, Integer> neighbor : countryGraph.get(currentCountry).entrySet()) {
+                String neighborCountry = neighbor.getKey();
+                int newDistance = distances.get(currentCountry) + neighbor.getValue();
+                if (newDistance < distances.get(neighborCountry)) {
+                    distances.put(neighborCountry, newDistance);
+                    previous.put(neighborCountry, currentCountry);
+                    priorityQueue.add(neighborCountry);
+                }
+            }
+        }
+
+        List<String> path = new ArrayList<>();
+        String currentCountry = country2;
+
+        while (currentCountry != null) {
+            path.add(currentCountry);
+            currentCountry = previous.get(currentCountry);
+        }
+
+        Collections.reverse(path);
+
+        return path.size() > 1 ? path : Collections.emptyList();
     }
+
 
     // TODO: Javadoc
     public void acceptUserInput() {
+        Scanner scan = new Scanner(System.in); // See source (6) in README.md
+
+        boolean exit = false;
+
+        while (!exit) {
+            System.out.print("Enter the name of the first country (type EXIT to quit): ");
+            String country1 = scan.nextLine().trim();
+
+            if (country1.equalsIgnoreCase("EXIT")) {
+                exit = true;
+            } else {
+
+                if (!countryGraph.containsKey(country1)) {
+                    System.out.println("Invalid country name. Please enter a valid country name.");
+                    continue;
+                }
+
+                if (country1.equals("Kosovo") || country1.equals("South Sudan")) {
+                    System.out.println("Valid country in the graph, however no available data in the distance file.");
+                    System.out.println("Please enter a different country name.");
+                    continue;
+                }
+
+                System.out.print("Enter the name of the second country (type EXIT to quit): ");
+                String country2 = scan.nextLine().trim();
+
+                if (country2.equalsIgnoreCase("EXIT")) {
+                    exit = true;
+                } else {
+
+                    if (!countryGraph.containsKey(country2)) {
+                        System.out.println("Invalid country name. Please enter a valid country name.");
+                        continue;
+                    }
+
+                    if (country2.equals("Kosovo") || country2.equals("South Sudan")) {
+                        System.out.println("Valid country in the graph, however no available data in the distance file.");
+                        System.out.println("Please enter a different country name.");
+                        continue;
+                    }
+
+                    // Find path between 2 valid countries
+                    List<String> travelPath = findPath(country1, country2);
+
+                    if (!travelPath.isEmpty()) { // Valid travel path between countries
+                        System.out.println("Route from " + country1 + " to " + country2 + ":");
+                        int totalDistance = 0;
+                        for (int i = 0; i < travelPath.size() - 1; i++) {
+                            String currentCountry = travelPath.get(i);
+                            String nextCountry = travelPath.get(i + 1);
+                            int distance = countryGraph.get(currentCountry).get(nextCountry);
+                            totalDistance += distance;
+                            System.out.println("* " + currentCountry + " --> " + nextCountry + " (" + distance + " km.)");
+                        }
+                        System.out.println("Total distance: " + totalDistance + " km.");
+                    } else { // No valid travel path between countries
+                        System.out.println("No path found between " + country1 + " and " + country2);
+                    }
+                }
+            }
+        }
+        scan.close(); // Close scanner after the loop
+    }
+    /*public void acceptUserInput() {
         Scanner scan = new Scanner(System.in); // See source (6) in README.md
 
         boolean exit = false;
@@ -258,8 +398,8 @@ public class IRoadTrip {
                         continue;
                     }
 
-                    // TODO: Find path between 2 valid countries
-                    /*List<String> travelPath = findPath(country1, country2);
+                    // Find path between 2 valid countries
+                    List<String> travelPath = findPath(country1, country2);
 
                     if (!travelPath.isEmpty()) { // Valid travel path between countries
                         System.out.println("Route from " + country1 + " to " + country2 + ":");
@@ -268,12 +408,12 @@ public class IRoadTrip {
                         }
                     } else { // No valid travel path between countries
                         System.out.println("No path found between " + country1 + " and " + country2);
-                    }*/
+                    }
                 }
             }
             scan.close();
         }
-    }
+    }*/
 
     // TODO: Javadoc
     // Main code provided
