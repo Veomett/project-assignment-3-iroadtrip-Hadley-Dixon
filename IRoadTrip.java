@@ -27,7 +27,7 @@ public class IRoadTrip {
         // Read in files
         tsvRead(args[2]); // state_name.tsv
         txtRead(args[0]); // borders.txt
-        // TODO: csvRead(args[1]); // capdist.csv
+        csvRead(args[1]); // capdist.csv
     }
 
     // TODO: Javadoc
@@ -151,18 +151,7 @@ public class IRoadTrip {
         }
     }
 
-
-
-
-    // TODO: RELEVANCE??? TODO: Javadoc
-    // Helper method to get a country's unique 3-letter ID
-    private String getCountry(String country) {
-        if (countryNameMap.containsKey(country)) {
-            return countryNameMap.get(country);
-        } return null;
-    }
-
-    /*// TODO: Javadoc
+    // TODO: Javadoc
     private void csvRead(String file) {
         try (Scanner scan = new Scanner(new File(file))) { // See source (4) in README.md
             if (scan.hasNextLine()) { // Read in next line if exists
@@ -171,26 +160,20 @@ public class IRoadTrip {
             while (scan.hasNextLine()) { // As long as a next line exists...
                 String fileLine = scan.nextLine();
                 String[] lineParts = fileLine.split(","); // REGEX: Split at ","
-                // Get country name from the unique 3-letter ID only if this is a valid ID in countryNameMap
-                String countryA = getCountry(lineParts[1].trim()); // Unique ID for country A
-                String countryB = getCountry(lineParts[3].trim()); // Unique ID for country B
+                String idCountryA = lineParts[1].trim(); // Unique ID for country A
+                System.out.println(idCountryA);
+                String idCountryB = lineParts[3].trim(); // Unique ID for country B
+                System.out.println(idCountryB);
                 int capitalDistance = Integer.parseInt(lineParts[5].trim()); // Distance between capitals of country A and country B in km
+                System.out.println(capitalDistance);
 
-                // If country A and country B are non-null, valid names, and adjacent...
-
-                if (countryA != null && countryB != null) {
-                    System.out.println("countryA: " + countryA);
-                    System.out.println("countryB: " + countryB);
-                    System.out.println("countryA in ######### GRAPH: " + countryChecker(countryA));
-                    System.out.println("countryB in ######### GRAPH: " + countryChecker(countryB));
-                    System.out.println("distance: " + capitalDistance);
-                    if (countryChecker(countryA) != null && countryChecker(countryB) != null) {
-                        if (countryGraph.containsKey(countryA) && countryGraph.get(countryA).containsKey(countryB)) {
-                            // Add capital distances to the respective graph
-                            countryGraph.get(countryA).put(countryB, capitalDistance);
-                            countryGraph.get(countryB).put(countryA, capitalDistance);
-                        }
-                    }
+                // valid names, and adjacent...
+                String countryA = getCountry(idCountryA);
+                String countryB = getCountry(idCountryB);
+                if (countryGraph.containsKey(countryA) && countryGraph.get(countryA).containsKey(countryB)) {
+                    // Add capital distances to the respective graph
+                    countryGraph.get(countryA).put(countryB, capitalDistance);
+                    countryGraph.get(countryB).put(countryA, capitalDistance);
                 }
             }
 
@@ -200,7 +183,17 @@ public class IRoadTrip {
             System.err.println(exception.getMessage());
             System.exit(1);
         }
-    }*/
+    }
+
+    // TODO: Javadoc
+    // Helper method to get a country's unique 3-letter ID
+    private String getCountry(String ID) {
+        for (String country : countryNameMap.keySet()) {
+            if (Objects.equals(countryNameMap.get(country), ID)) {
+                return country;
+            }
+        } return null;
+    }
 
     // TODO: getDistance
     // TODO: Javadoc
