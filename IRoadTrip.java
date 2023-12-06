@@ -29,6 +29,8 @@ public class IRoadTrip {
         tsvRead(args[2]); // state_name.tsv
         csvRead(args[1]); // capdist.csv
 
+
+
     }
 
     // TODO: Javadoc
@@ -98,28 +100,34 @@ public class IRoadTrip {
                 String[] lineParts = fileLine.split(","); // REGEX: Split at ","
                 // Get country name from the unique 3-letter ID only if this is a valid ID in countryNameMap
                 String countryA = getCountry(lineParts[1].trim()); // Unique ID for country A
-               // TEST: System.out.println(countryA);
                 String countryB = getCountry(lineParts[3].trim()); // Unique ID for country B
-                // TEST: System.out.println(countryB);
-                // TEST : System.out.println();
                 int capitalDistance = Integer.parseInt(lineParts[5].trim()); // Distance between capitals of country A and country B in km
 
 
-                // If country A and country B are adjacent...
+                System.out.println("countryA: " + countryA);
+                System.out.println("countryB: " + countryB);
+                System.out.println("distance: " + capitalDistance);
 
-                if (countryGraph.containsKey(countryA) && countryGraph.get(countryA).containsKey(countryB)) {
-                    // Add capital distances to the respective (undirected) graph
-                    System.out.println("my error is here");
-                    countryGraph.get(countryA).put(countryB, capitalDistance);
+                // If country A and country B are non-null, valid names, and adjacent...
+                if (countryA != null && countryB != null) {
+                    System.out.println("countryA in graph: " + countryChecker(countryA));
+                    System.out.println("countryB in graph: " + countryChecker(countryB));
+                    if (countryChecker(countryA) != null && countryChecker(countryB) != null) {
+                        if (countryGraph.containsKey(countryA) && countryGraph.get(countryA).containsKey(countryB)) {
+                            // Add capital distances to the respective (undirected) graph
+                            //System.out.println("START");
+                            countryGraph.get(countryA).put(countryB, capitalDistance);
+                            //System.out.println("FIRST_GRAB");
+                            // TODO: I try to get Czech republic node in countryGraph, and assign 162 to the distance between Austria and Czech republic, but it only exists as Czechia in my graph
+                            countryGraph.get(countryB).put(countryA, capitalDistance); // TODO: ERROR
+                            //System.out.println("SECOND_GRAB");
 
-                    countryGraph.get(countryB).put(countryA, capitalDistance);
-                    System.out.println("my error is here 2");
-
-
+                        }
+                    }
                 }
 
-                System.out.println("my error is here3");
-                // TODO: error is somewhere here
+                // System.out.println("END");
+                // System.out.println();
             }
 
             System.out.println("Country graph with distances now: " + countryGraph);
@@ -155,27 +163,35 @@ public class IRoadTrip {
 
     // TODO: Javadoc
     // Helper function to navigate different references to the same country without hardcode
-    private boolean countryChecker(String country) {
-        // Is input country in countryGraph
+    private String countryChecker(String country) {
+
+        // Iterate through all valid country names (keys) in graph
         for (String validCountry : countryGraph.keySet()) {
-            // Check if input country is a substring of a valid country in graph
-            if (validCountry.equals(country) || validCountry.contains(country) || country.contains(validCountry)) {
-                return true;
+            // Check if the input country is an exact match or a substring of a valid country in the graph
+            if (validCountry.equals(country)) {
+                //System.out.println("in country graph"); // TEST
+                return validCountry; // the input country is valid
+            } else if (Objects.equals(country, "Dominican Republic")) { // Edge case
+                return "Dominican Republic";
+            } else if (validCountry.contains(country) || country.contains(validCountry)) {
+                return validCountry;
             }
         }
 
-        // Is input country in countryNameMap
+        // Iterate through the keys (encoded names) in countryNameMap
         for (String encodedName : countryNameMap.keySet()) {
-            // Check if input country is a substring of a valid encoded country in map
+            // Check if the input country is an exact match with a valid encoded country in the map
             if (encodedName.equals(country)) {
-                return true;
+                System.out.println("in name map"); // TEST
+                return country; // the input country is valid
             }
         }
 
-        return false;
+        //System.out.println("FALSE"); // TEST
+        return null;
     }
 
-    // TODO: Javadoc
+    /*// TODO: Javadoc
     public void acceptUserInput() {
         Scanner scan = new Scanner(System.in); // See source (6) in README.md
 
@@ -209,7 +225,7 @@ public class IRoadTrip {
                     }
 
                     // TODO: Find path between 2 valid countries
-                    /*List<String> travelPath = findPath(country1, country2);
+                    *//*List<String> travelPath = findPath(country1, country2);
 
                     if (!travelPath.isEmpty()) { // Valid travel path between countries
                         System.out.println("Route from " + country1 + " to " + country2 + ":");
@@ -218,18 +234,18 @@ public class IRoadTrip {
                         }
                     } else { // No valid travel path between countries
                         System.out.println("No path found between " + country1 + " and " + country2);
-                    }*/
+                    }*//*
                 }
             }
             scan.close();
         }
-    }
+    }*/
 
     // TODO: Javadoc
     // Main code provided
     public static void main (String[] args){
         IRoadTrip a3 = new IRoadTrip(args);
-        a3.acceptUserInput();
+        // a3.acceptUserInput();
     }
 }
 
