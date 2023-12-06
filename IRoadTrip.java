@@ -27,11 +27,12 @@ public class IRoadTrip {
         // Read in files
         txtRead(args[0]); // borders.txt
         tsvRead(args[2]); // state_name.tsv
-        // TODO: csvRead(args[1]); // capdist.csv
+        csvRead(args[1]); // capdist.csv
 
     }
 
     // TODO: Javadoc
+    // Creates a graph of all the countries in borders.txt and their associated adjacent countries
     private void txtRead(String file) {
         try (Scanner scan = new Scanner(new File(file))) { // See source (2) in README.md
             while (scan.hasNextLine()) { // As long as a next line exists...
@@ -51,7 +52,9 @@ public class IRoadTrip {
                     }
                 }
             }
-            // TEST: System.out.println(countryGraph);
+
+            System.out.println("Country Graph: " + countryGraph); // TEST
+
         } catch (Exception exception) { // See source (3) in README.md
             System.err.println(exception.getMessage());
             System.exit(1);
@@ -59,6 +62,7 @@ public class IRoadTrip {
     }
 
     // TODO: Javadoc
+    // Creates a map of country names and their unique 3-letter IDs corresponding to 2020
     private void tsvRead(String file) {
         try (Scanner scan = new Scanner(new File(file))) { // See source (5) in README.md
             if (scan.hasNextLine()) { // Read in next line if exists
@@ -74,48 +78,65 @@ public class IRoadTrip {
                     countryNameMap.put(encodedName, decodedName);
                 }
             }
-            // TEST
-            System.out.println(countryNameMap);
+
+            System.out.println("Country Name Map: " + countryNameMap); // TEST
+
         } catch (Exception exception) {
             System.err.println(exception.getMessage());
             System.exit(1);
         }
     }
 
-    /*// TODO: Javadoc
+    // TODO: Javadoc
     private void csvRead(String file) {
         try (Scanner scan = new Scanner(new File(file))) { // See source (4) in README.md
             if (scan.hasNextLine()) { // Read in next line if exists
                 scan.nextLine();
             }
-
             while (scan.hasNextLine()) { // As long as a next line exists...
                 String fileLine = scan.nextLine();
                 String[] lineParts = fileLine.split(","); // REGEX: Split at ","
+                // Get country name from the unique 3-letter ID only if this is a valid ID in countryNameMap
                 String countryA = getCountry(lineParts[1].trim()); // Unique ID for country A
+               // TEST: System.out.println(countryA);
                 String countryB = getCountry(lineParts[3].trim()); // Unique ID for country B
+                // TEST: System.out.println(countryB);
+                // TEST : System.out.println();
                 int capitalDistance = Integer.parseInt(lineParts[5].trim()); // Distance between capitals of country A and country B in km
 
+
                 // If country A and country B are adjacent...
+
                 if (countryGraph.containsKey(countryA) && countryGraph.get(countryA).containsKey(countryB)) {
                     // Add capital distances to the respective (undirected) graph
+                    System.out.println("my error is here");
                     countryGraph.get(countryA).put(countryB, capitalDistance);
+
                     countryGraph.get(countryB).put(countryA, capitalDistance);
+                    System.out.println("my error is here 2");
+
+
                 }
+
+                System.out.println("my error is here3");
+                // TODO: error is somewhere here
             }
+
+            System.out.println("Country graph with distances now: " + countryGraph);
+
         } catch (Exception exception) {
             System.err.println(exception.getMessage());
             System.exit(1);
         }
-    }*/
+    }
 
-    /*// TODO: Javadoc
-    // Helper method to get unique country ID, used in
+    // TODO: Javadoc
+    // Helper method to get a country's unique 3-letter ID
     private String getCountry(String country) {
         if (countryNameMap.containsKey(country)) {
             return countryNameMap.get(country);
         } return null;
-    }*/
+    }
 
     // TODO: getDistance
     // TODO: Javadoc
