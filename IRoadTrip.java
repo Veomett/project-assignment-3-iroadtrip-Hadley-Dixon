@@ -26,8 +26,9 @@ public class IRoadTrip {
 
         // Read in files
         txtRead(args[0]); // borders.txt
-        csvRead(args[1]); // capdist.csv
         tsvRead(args[2]); // state_name.tsv
+        // TODO: csvRead(args[1]); // capdist.csv
+
     }
 
     // TODO: Javadoc
@@ -37,7 +38,6 @@ public class IRoadTrip {
                 String fileLine = scan.nextLine(); // read line by line
                 String[] lineParts = fileLine.split("= "); // REGEX: split at '=', limited by 2 parts
                 String countryName = lineParts[0].trim(); // before '=' is country name
-                System.out.println(countryName); // TEST
                 if (!countryGraph.containsKey(countryName)) { // If the country is not already in our graph,
                     countryGraph.put(countryName, new HashMap<>()); // Add country to the graph
                 }
@@ -51,7 +51,7 @@ public class IRoadTrip {
                     }
                 }
             }
-            System.out.println(countryGraph);
+            // TEST: System.out.println(countryGraph);
         } catch (Exception exception) { // See source (3) in README.md
             System.err.println(exception.getMessage());
             System.exit(1);
@@ -59,6 +59,30 @@ public class IRoadTrip {
     }
 
     // TODO: Javadoc
+    private void tsvRead(String file) {
+        try (Scanner scan = new Scanner(new File(file))) { // See source (5) in README.md
+            if (scan.hasNextLine()) { // Read in next line if exists
+                scan.nextLine();
+            }
+
+            while (scan.hasNextLine()) { // As long as a next line exists...
+                String fileLine = scan.nextLine();
+                String[] lineParts = fileLine.split("\t"); // REGEX: Split at tab
+                if (lineParts.length == 5 && Objects.equals(lineParts[4], "2020-12-31")) {
+                    String encodedName = lineParts[1].trim(); // The encoded name for a country (eg. JAM)
+                    String decodedName = lineParts[2].trim(); // The decoded name for a country (eg. Jamaica)
+                    countryNameMap.put(encodedName, decodedName);
+                }
+            }
+            // TEST
+            System.out.println(countryNameMap);
+        } catch (Exception exception) {
+            System.err.println(exception.getMessage());
+            System.exit(1);
+        }
+    }
+
+    /*// TODO: Javadoc
     private void csvRead(String file) {
         try (Scanner scan = new Scanner(new File(file))) { // See source (4) in README.md
             if (scan.hasNextLine()) { // Read in next line if exists
@@ -83,35 +107,15 @@ public class IRoadTrip {
             System.err.println(exception.getMessage());
             System.exit(1);
         }
-    }
+    }*/
 
-    // TODO: Javadoc
+    /*// TODO: Javadoc
     // Helper method to get unique country ID, used in
     private String getCountry(String country) {
         if (countryNameMap.containsKey(country)) {
             return countryNameMap.get(country);
         } return null;
-    }
-
-    // TODO: Javadoc
-    private void tsvRead(String file) {
-        try (Scanner scan = new Scanner(new File(file))) { // See source (5) in README.md
-            if (scan.hasNextLine()) { // Read in next line if exists
-                scan.nextLine();
-            }
-
-            while (scan.hasNextLine()) { // As long as a next line exists...
-                String fileLine = scan.nextLine();
-                String[] lineParts = fileLine.split("\t"); // REGEX: Split at tab
-                String encodedName = lineParts[1].trim(); // The encoded name for a country (eg. JAM)
-                String decodedName = lineParts[2].trim(); // The decoded name for a country (eg. Jamaica)
-                countryNameMap.put(encodedName, decodedName);
-            }
-        } catch (Exception exception) {
-            System.err.println(exception.getMessage());
-            System.exit(1);
-        }
-    }
+    }*/
 
     // TODO: getDistance
     // TODO: Javadoc
