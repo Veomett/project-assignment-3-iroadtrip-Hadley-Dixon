@@ -6,15 +6,13 @@ import java.io.*;
 // TODO: Javadoc
 public class IRoadTrip {
 
-    // Graph structure: https://www.geeksforgeeks.org/implementing-generic-graph-in-java/
+    // See source (1) in README.md
     private Map<String, Map<String, Integer>> countryGraph; // Graph of adjacent countries
     private Map<String, String> countryNameMap; // Map of country names
 
 
     // TODO: Javadoc
     public IRoadTrip (String [] args) {
-        // Test: System.out.println(args.length);
-
         // Handle when invalid input
         if (args.length != 3) {
             System.err.println("Invalid input");
@@ -34,7 +32,7 @@ public class IRoadTrip {
 
     // TODO: Javadoc
     private void txtRead(String file) {
-        try (Scanner scan = new Scanner(new File(file))) { // Scanner on .txt: https://www.geeksforgeeks.org/different-ways-reading-text-file-java/
+        try (Scanner scan = new Scanner(new File(file))) { // See source (2) in README.md
             while (scan.hasNextLine()) { // As long as a next line exists...
                 String fileLine = scan.nextLine(); // read line by line
                 String[] lineParts = fileLine.split("="); // REGEX: split at '='
@@ -53,7 +51,7 @@ public class IRoadTrip {
                     }
                 }
             }
-        } catch (Exception exception) { // Exceptions: https://www.tutorialspoint.com/javaexamples/exception_method.htm
+        } catch (Exception exception) { // See source (3) in README.md
             System.err.println(exception.getMessage());
             System.exit(1);
         }
@@ -61,7 +59,7 @@ public class IRoadTrip {
 
     // TODO: Javadoc
     private void csvRead(String file) {
-        try (Scanner scan = new Scanner(new File(file))) { // Scanner on .csv: https://www.youtube.com/watch?v=rj6vyIn90zk
+        try (Scanner scan = new Scanner(new File(file))) { // See source (4) in README.md
             if (scan.hasNextLine()) { // Read in next line if exists
                 scan.nextLine();
             }
@@ -96,7 +94,7 @@ public class IRoadTrip {
 
     // TODO: Javadoc
     private void tsvRead(String file) {
-        try (Scanner scan = new Scanner(new File(file))) { // Scanner .tsv: https://codepal.ai/code-generator/query/0pkdvNiV/java-program-read-student-information
+        try (Scanner scan = new Scanner(new File(file))) { // See source (5) in README.md
             if (scan.hasNextLine()) { // Read in next line if exists
                 scan.nextLine();
             }
@@ -153,7 +151,7 @@ public class IRoadTrip {
 
     // TODO: Javadoc
     public void acceptUserInput() {
-        Scanner scan = new Scanner(System.in); // Scanner for user input: https://www.theserverside.com/tutorial/Your-top-Java-user-input-strategies
+        Scanner scan = new Scanner(System.in); // See source (6) in README.md
 
         boolean exit = false;
 
