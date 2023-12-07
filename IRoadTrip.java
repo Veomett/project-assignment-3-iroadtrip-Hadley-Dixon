@@ -116,7 +116,7 @@ public class IRoadTrip {
 
             while (scan.hasNextLine()) { // Next line exists
                 String fileLine = scan.nextLine();
-                String[] lineParts = fileLine.split("\t"); // REGEX: Split at tab
+                String[] lineParts = fileLine.split("\t"); // Split country name from country ID. REGEX: Split at tab
                 if (lineParts.length == 5 && Objects.equals(lineParts[4], "2020-12-31")) { // Extract only 2020 data
                     String encodedName = lineParts[1].trim(); // The encoded name for a country (eg. JAM)
                     String decodedName = lineParts[2].trim(); // The decoded name for a country (eg. Jamaica)
@@ -143,33 +143,34 @@ public class IRoadTrip {
      * @param file String filename
      */
     private void txtRead(String file) {
-        try (Scanner scan = new Scanner(new File(file))) { // See source (2) in README.md
-            while (scan.hasNextLine()) { // As long as a next line exists...
-                String fileLine = scan.nextLine(); // read line by line
-                String[] lineParts = fileLine.split("= "); // REGEX: split at '=', limited by 2 parts
-                String countryName = lineParts[0].trim(); // before '=' is country name
+        try (Scanner scan = new Scanner(new File(file))) {
+            while (scan.hasNextLine()) { // Next line exists
+                String fileLine = scan.nextLine();
+                String[] lineParts = fileLine.split("= "); // Split country name from adjacent countries. REGEX: split at '=', limited by 2 parts
+                String countryName = lineParts[0].trim(); // Country name precedes '='
                 if (!countryGraph.containsKey(countryName) && countryNameMap.containsKey(countryName)) { // If the country is not already in our graph, and it has a 3-letter ID tag
                     countryGraph.put(countryName, new HashMap<>()); // Add country to the graph
 
-                    if (lineParts.length > 1) { // If the country has neighbors
-                        String[] neighborArr = lineParts[1].split(";"); // Create an array of neighboring countries; REGEX: split at ";"
+                    if (lineParts.length > 1) { // The country has adjacent countries
+                        String[] neighborArr = lineParts[1].split(";"); // Split differing adjacent countries from one another.  REGEX: split at ";"
 
-                        for (String neighboringCountry : neighborArr) {
-                            String[] neighborStats = neighboringCountry.trim().split("\\s+(?=\\d)", 2); // REGEX: split at the first occurrence of digits; Neighbor name and capital distance
-                            String testerNeighbor = transform(neighborStats[0]);
-                            if (countryNameMap.containsKey(testerNeighbor)) {
-                                countryGraph.get(countryName).put(testerNeighbor, 0); // Default capital distance 0
+                        for (String neighboringCountry : neighborArr) { // Loop through adjacent countries
+                            String[] neighborStats = neighboringCountry.trim().split("\\s+(?=\\d)", 2); // Split name of adjacent country from border distance. REGEX: split at the first occurrence of digits
+                            String testerNeighbor = transform(neighborStats[0]); // Translate country name to 'official' title
+                            if (countryNameMap.containsKey(testerNeighbor)) { // Country is a valid country in our country name map
+                                countryGraph.get(countryName).put(testerNeighbor, 0); // Set default capital distance 0
                             }
                         }
                     }
                 }
             }
 
+            // TEST
             System.out.println("If country in 'borders.txt' is present in the map of valid country names, country is added to a graph of adjacent countries (default distance between capitals is 0)");
             System.out.println(countryGraph);
             System.out.println();
 
-        } catch (Exception exception) { // See source (3) in README.md
+        } catch (Exception exception) {
             System.err.println(exception.getMessage());
             System.exit(1);
         }
@@ -181,9 +182,10 @@ public class IRoadTrip {
      * @return Official name of country corresponding to input ID
      */
     private String getCountry(String ID) {
+        // Loop through valid countries in country name map
         for (String country : countryNameMap.keySet()) {
-            if (Objects.equals(countryNameMap.get(country), ID)) {
-                return country;
+            if (Objects.equals(countryNameMap.get(country), ID)) { // ID matches an ID of one of the valid countries
+                return country; // Return 'official' country name
             }
         } return null;
     }
@@ -198,11 +200,11 @@ public class IRoadTrip {
      * @param file String file name
      */
     private void csvRead(String file) {
-        try (Scanner scan = new Scanner(new File(file))) { // See source (4) in README.md
+        try (Scanner scan = new Scanner(new File(file))) {
             if (scan.hasNextLine()) { // Read in next line if exists
                 scan.nextLine();
             }
-            while (scan.hasNextLine()) { // As long as a next line exists...
+            while (scan.hasNextLine()) { // Next line exists
                 String fileLine = scan.nextLine();
                 String[] lineParts = fileLine.split(","); // REGEX: Split at ","
                 String idCountryA = lineParts[1].trim(); // Unique ID for country A
@@ -216,17 +218,19 @@ public class IRoadTrip {
                     idCountryB = "UKG";
                 }
 
-                // valid names, and adjacent...
+                // Get the 'official' country name from country name map
                 String countryA = getCountry(idCountryA);
                 String countryB = getCountry(idCountryB);
 
+                // Graph of adjacent countries contains country A and country B is an adjacent country to country A
                 if (countryGraph.containsKey(countryA) && countryGraph.get(countryA).containsKey(countryB)) {
-                    // Add capital distances to the respective graph
+                    // Add the distance between capitals of country A and country B to the graph of adjacent countries
                     countryGraph.get(countryA).put(countryB, capitalDistance);
                     countryGraph.get(countryB).put(countryA, capitalDistance);
                 }
             }
 
+            // TEST
             System.out.println("If distance data is present in 'capdist.csv', distance between capitals of adjacent countries is adjusted in graph");
             System.out.println(countryGraph);
             System.out.println();
@@ -268,66 +272,67 @@ public class IRoadTrip {
      * by the user, method prints the path between those countries if such a path exists.
      */
     public void acceptUserInput() {
-        Scanner scan = new Scanner(System.in); // See source (6) in README.md
-
+        Scanner scan = new Scanner(System.in);
         boolean exit = false;
 
         while (!exit) {
-            System.out.print("Enter the name of the first country (type EXIT to quit): ");
+            System.out.print("Enter the name of the first country (type EXIT to quit): "); // Prompt user for first country
             String country1 = scan.nextLine().trim();
 
-            if (country1.equalsIgnoreCase("EXIT")) {
+            if (country1.equalsIgnoreCase("EXIT")) { // User exits program
                 exit = true;
             } else {
 
-                if (!countryGraph.containsKey(country1)) {
+                if (!countryGraph.containsKey(country1)) { // Input country is an invalid country
                     System.out.println("Invalid country name. Please enter a valid country name.");
                     System.out.println("See README.md for valid country requirements");
                     continue;
                 }
 
+                // Handle edge case. See README.md for valid country requirements.
                 if (country1.equals("Kosovo") || country1.equals("South Sudan")) {
                     System.out.println("Valid country, but no available distance data.");
                     System.out.println("Please enter a new country name.");
                     continue;
                 }
 
-                System.out.print("Enter the name of the second country (type EXIT to quit): ");
+                System.out.print("Enter the name of the second country (type EXIT to quit): "); // Prompt user for first country
                 String country2 = scan.nextLine().trim();
 
-                if (country2.equalsIgnoreCase("EXIT")) {
+                if (country2.equalsIgnoreCase("EXIT")) { // User exits program
                     exit = true;
                 } else {
 
-                    if (!countryGraph.containsKey(country2)) {
+                    if (!countryGraph.containsKey(country2)) { // Input country is an invalid country
                         System.out.println("Invalid country name. Please enter a valid country name.");
                         System.out.println("See README.md for valid country requirements");
                         continue;
                     }
 
+                    // Handle edge case. See README.md for valid country requirements.
                     if (country2.equals("Kosovo") || country2.equals("South Sudan")) {
                         System.out.println("Valid country, but no available distance data.");
                         System.out.println("Please enter a different new name.");
                         continue;
                     }
 
-                    /*// Find path between 2 valid countries
+                    // Find path between 2 valid countries
                     List<String> travelPath = findPath(country1, country2);
 
-                    if (!travelPath.isEmpty()) { // Valid travel path between countries
+                    if (!travelPath.isEmpty()) { // A valid travel path between country 1 and country 1 exists
                         System.out.println("Route from " + country1 + " to " + country2 + ":");
-                        int totalDistance = 0;
+                        int totalDistance = 0; // Distance counter
                         for (int i = 0; i < travelPath.size() - 1; i++) {
                             String currentCountry = travelPath.get(i);
                             String nextCountry = travelPath.get(i + 1);
-                            int distance = countryGraph.get(currentCountry).get(nextCountry);
-                            totalDistance += distance;
-                            System.out.println("* " + currentCountry + " --> " + nextCountry + " (" + distance + " km.)");
+                            int distance = countryGraph.get(currentCountry).get(nextCountry); // Extract distance between capitals
+                            totalDistance += distance; // Increment total distance
+                            System.out.println("* " + currentCountry + " --> " + nextCountry + " (" + distance + " km.)"); // Output travel path
                         }
-                        System.out.println("Total distance: " + totalDistance + " km.");
-                    } else { // No valid travel path between countries
+                        System.out.println("Total distance: " + totalDistance + " km."); // Output total distance traveled
+                    } else { // No valid travel path between country 1 and country 1 exists
                         System.out.println("No path found between " + country1 + " and " + country2);
-                    }*/
+                    }
                 }
             }
         } scan.close(); // Close scanner after the loop
