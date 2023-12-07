@@ -46,3 +46,7 @@ According to responses from Prof. Brizan and Prof. Veomett on Slack, as well as 
 (5) Scanner .tsv: https://codepal.ai/code-generator/query/0pkdvNiV/java-program-read-student-information
 
 (6) Scanner for user input: https://www.theserverside.com/tutorial/Your-top-Java-user-input-strategies
+
+(7) Dijkstra's Algorithm: https://www.freecodecamp.org/news/dijkstras-algorithm-explained-with-a-pseudocode-example/
+
+(8) Lecture slides

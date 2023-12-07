@@ -4,8 +4,28 @@ Can you plan the path for a road trip from one country to another?
 
 Change the java source code, but do not change the data files. See Canvas for assignment details.
 
+## ASSIGNMENT DESCRIPTION (percieved) ERROR
+According to the assignment description, the following is a valid path from Gabon to France:
+
+Enter the name of the first country (type EXIT to quit): Gabon Enter the name of the second country (type EXIT to quit): France Route from Gabon to France:
+* Gabon --> Cameroon (405 km.)
+* Cameroon --> Nigeria (963 km.)
+* Nigeria --> Niger (788 km.)
+* Niger --> Algeria (2561 km.)
+* Algeria --> Morocco (958 km.)
+* Morocco --> Spain (822 km.)
+* Spain --> France (1012 km.)
+
+While it is the case that if you code 'Spain (Cueta)' (a very small part on the top part of the African continent) as 
+'Spain' in your implementation, then 'Spain' and 'Morroco' would be adjacent countries, there would *still* be no 
+feasible path from Morroco to Spain, unless you would consider biking from Morocco across the Mediterranean Sea to 
+Spain and then into France. Based on feedback from Prof. Veomett on her implementation on the Canada-Greenland 
+situation, I have decided that the route above is not logical, and therefore my algorithm takes the eastern route 
+through the Middle Eastern territories. See my full implementation below.
+
 ## My Implementation
-According to responses from Prof. Brizan and Prof. Veomett on Slack, as well as the project description, I have implemented Project 3 in the following way:
+According to responses from Prof. Brizan and Prof. Veomett on Slack, as well as the project description, I have 
+implemented Project 3 in the following way:
 
 - I first read in 'state_name.tsv'. This was because we should only include countries that exist in 2020. I extracted the 3-letter unique ID's from each country in 'state_name.tsv' with data from in 2020.
   - I created a Hashmap of these unique IDs with the associated country name as their key. (Note that these keys will later change to reflect 'official' spelling).
@@ -46,3 +66,7 @@ According to responses from Prof. Brizan and Prof. Veomett on Slack, as well as 
 (5) Scanner .tsv: https://codepal.ai/code-generator/query/0pkdvNiV/java-program-read-student-information
 
 (6) Scanner for user input: https://www.theserverside.com/tutorial/Your-top-Java-user-input-strategies
+
+(7) Dijkstra's Algorithm: https://www.freecodecamp.org/news/dijkstras-algorithm-explained-with-a-pseudocode-example/
+
+(8) Lecture slides

@@ -126,11 +126,6 @@ public class IRoadTrip {
                 }
             }
 
-            // TESTING
-            System.out.println("If 3-letter country ID from 2020 is present in 'state_name.tsv', country is added to map of valid country names");
-            System.out.println(countryNameMap);
-            System.out.println();
-
         } catch (Exception exception) {
             System.err.println(exception.getMessage());
             System.exit(1);
@@ -165,10 +160,21 @@ public class IRoadTrip {
                 }
             }
 
-            // TEST
-            System.out.println("If country in 'borders.txt' is present in the map of valid country names, country is added to a graph of adjacent countries (default distance between capitals is 0)");
-            System.out.println(countryGraph);
-            System.out.println();
+            // Handle edge cases when country has 3-letter ID but distance data is not present (Kosovo & South Sudan)
+            countryGraph.get("Central African Republic").remove("South Sudan");
+            countryGraph.get("Congo, Democratic Republic of the").remove("South Sudan");
+            countryGraph.get("Ethiopia").remove("South Sudan");
+            countryGraph.get("Kenya").remove("South Sudan");
+            countryGraph.get("Sudan").remove("South Sudan");
+            countryGraph.get("Uganda").remove("South Sudan");
+            countryGraph.remove("South Sudan");
+
+            countryGraph.get("Albania").remove("Kosovo");
+            countryGraph.get("Lithuania").remove("Kosovo");
+            countryGraph.get("Montenegro").remove("Kosovo");
+            countryGraph.get("North Macedonia").remove("Kosovo");
+            countryGraph.get("Serbia").remove("Kosovo");
+            countryGraph.remove("Kosovo");
 
         } catch (Exception exception) {
             System.err.println(exception.getMessage());
@@ -230,11 +236,6 @@ public class IRoadTrip {
                 }
             }
 
-            // TEST
-            System.out.println("If distance data is present in 'capdist.csv', distance between capitals of adjacent countries is adjusted in graph");
-            System.out.println(countryGraph);
-            System.out.println();
-
         } catch (Exception exception) {
             System.err.println(exception.getMessage());
             System.exit(1);
@@ -257,7 +258,6 @@ public class IRoadTrip {
             return -1; //
         }
 
-        // Use temporary hashmaps to traverse the adjacent country graph
         Map<String, Integer> distanceGraph = new HashMap<>(); // Hashmap for the shortest distance found to each adjacent country.
         Map<String, String> previousCountry = new HashMap<>(); // Hashmap for the most recent country along the shortest path through the adjacent country graph.
 
@@ -265,14 +265,12 @@ public class IRoadTrip {
         for (String country : countryGraph.keySet()) { // Loop through each valid country in adjacent country graph
             distanceGraph.put(country, Integer.MAX_VALUE);
         }
-        distanceGraph.put(country1, 0); // Set 0 as default distance for starting country
 
-        // Map of visited countries along path.
-        Set<String> visitedCountries = new HashSet<>();
+        distanceGraph.put(country1, 0); // Set 0 as default distance for starting country
+        Set<String> visitedCountries = new HashSet<>(); // Map of visited countries along path.
 
         while (!visitedCountries.contains(country2)) { // Country 2 has not been visited yet
             String currentCountry = getMinDistance(distanceGraph, visitedCountries); // Minimum distance to country 2
-
             visitedCountries.add(currentCountry); // Add country 2 is map of visited countries
 
             // Loop through adjacent countries of a country
@@ -285,14 +283,13 @@ public class IRoadTrip {
 
                 if (updatedDistance < distanceGraph.get(neighborCountry)) { // Compare distances when country is visited
                     distanceGraph.put(neighborCountry, updatedDistance); // Store minimum distance
-
                     previousCountry.put(neighborCountry, currentCountry); // Adjust path
                 }
             }
         }
 
         // Calculate total distance using the shortest travel path
-        List<String> shortestPath = new ArrayList<>(); //
+        List<String> shortestPath = new ArrayList<>();
         String curr = country2;
         while (!curr.equals(country1)) { // Traverse backwards
             shortestPath.add(0, curr);
@@ -334,11 +331,57 @@ public class IRoadTrip {
      * reports distance along the path.
      * @param country1 String name of a country
      * @param country2 String name of a country
-     * @return The shortest from country1 to country2 through respective capitals along the path.
+     * @return The shortest path from country 1 to country 2 through respective capitals along the path.
      */
     public List<String> findPath(String country1, String country2) {
-        // TODO: findPath
-        return null;
+
+        if (!countryGraph.containsKey(country1) || !countryGraph.containsKey(country2)) { // Country 1 or country 2 is not in adjacent country graph
+            return new ArrayList<>();
+        }
+
+        Map<String, Integer> distanceGraph = new HashMap<>(); // Hashmap for the shortest distance found to each adjacent country.
+        Map<String, String> previousCountry = new HashMap<>(); // Hashmap for the most recent country along the shortest path through the adjacent country graph.
+
+        // Initialize default distances
+        for (String country : countryGraph.keySet()) { // Loop through each valid country in adjacent country graph
+            distanceGraph.put(country, Integer.MAX_VALUE);
+        }
+
+        distanceGraph.put(country1, 0); // Set 0 as default distance for starting country
+        Set<String> visitedCountries = new HashSet<>(); // Map of visited countries along path.
+        List<String> shortestPath = new ArrayList<>(); // The shortest travel path
+
+        while (!visitedCountries.contains(country2)) { // Country 2 has not been visited yet
+            String currentCountry = getMinDistance(distanceGraph, visitedCountries); // Minimum distance to country 2
+            visitedCountries.add(currentCountry); // Add country 2 to map of visited countries
+
+            // Loop through adjacent countries of a country
+            for (Map.Entry<String, Integer> neighbor : countryGraph.get(currentCountry).entrySet()) {
+                String neighborCountry = neighbor.getKey(); // Extract 'official' adjacent country name.
+                int tempDistance = neighbor.getValue(); // Extract distance to adjacent country.
+
+                // Update distance through newly visited country
+                int updatedDistance = distanceGraph.get(currentCountry) + tempDistance;
+
+                if (updatedDistance < distanceGraph.get(neighborCountry)) { // Compare distances when country is visited
+                    distanceGraph.put(neighborCountry, updatedDistance); // Store minimum distance
+                    previousCountry.put(neighborCountry, currentCountry); // Adjust path
+                }
+            }
+        }
+
+        // Return the list of countries along the shortest path from country 1 to country 2
+        if (previousCountry.containsKey(country2)) {
+            String curr = country2;
+            shortestPath.add(curr);
+
+            while (!curr.equals(country1)) {
+                curr = previousCountry.get(curr);
+                shortestPath.add(0, curr);
+            }
+        }
+
+        return shortestPath;
     }
 
     /**
@@ -413,6 +456,21 @@ public class IRoadTrip {
         } scan.close(); // Close scanner after the loop
     }
 
+    public void tester() {
+        System.out.println("--------------------------");
+        System.out.println("GRAPH OUTPUTS:");
+        System.out.println("See README.md for valid country requirements");
+        System.out.println("--------------------------");
+        System.out.println("Map of valid country names their unique IDs:");
+        System.out.println(countryNameMap);
+        System.out.println();
+        System.out.println("Map of adjacent countries:");
+        System.out.println(countryGraph);
+        System.out.println("--------------------------");
+        System.out.println("BEGIN USER INPUT");
+        System.out.println("--------------------------");
+    }
+
     /**
      * Main code provided; IRoadTrip class will be called through the main function as follows:
      * 'java IRoadTrip borders.txt capdist.csv state_name.tsv'
@@ -420,12 +478,7 @@ public class IRoadTrip {
      */
     public static void main (String[] args){
         IRoadTrip a3 = new IRoadTrip(args);
-
-        System.out.println(a3.getDistance("USF", "My House")); // TEST
-        System.out.println(a3.getDistance("France", "Spain")); // TEST
-        System.out.println(a3.getDistance("Canada", "Panama")); // TEST
-
+        a3.tester();
         a3.acceptUserInput();
     }
 }
-
