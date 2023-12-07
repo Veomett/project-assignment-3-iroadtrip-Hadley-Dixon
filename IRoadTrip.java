@@ -249,8 +249,83 @@ public class IRoadTrip {
      * @return int distance between the capitals of country1 and country2, -1 otherwise
      */
     public int getDistance(String country1, String country2) {
-        // TODO: getDistance
-        return -1;
+        if (!countryGraph.containsKey(country1) || !countryGraph.containsKey(country2)) { // Country 1 or country 2 is not a valid country in adjacent country graph
+            return -1; // Invalid input
+        }
+
+        if (!countryGraph.get(country1).containsKey(country2)) { // Country 1 is not adjacent to country 2
+            return -1; //
+        }
+
+        // Use temporary hashmaps to traverse the adjacent country graph
+        Map<String, Integer> distanceGraph = new HashMap<>(); // Hashmap for the shortest distance found to each adjacent country.
+        Map<String, String> previousCountry = new HashMap<>(); // Hashmap for the most recent country along the shortest path through the adjacent country graph.
+
+        // Initialize default distances
+        for (String country : countryGraph.keySet()) { // Loop through each valid country in adjacent country graph
+            distanceGraph.put(country, Integer.MAX_VALUE);
+        }
+        distanceGraph.put(country1, 0); // Set 0 as default distance for starting country
+
+        // Map of visited countries along path.
+        Set<String> visitedCountries = new HashSet<>();
+
+        while (!visitedCountries.contains(country2)) { // Country 2 has not been visited yet
+            String currentCountry = getMinDistance(distanceGraph, visitedCountries); // Minimum distance to country 2
+
+            visitedCountries.add(currentCountry); // Add country 2 is map of visited countries
+
+            // Loop through adjacent countries of a country
+            for (Map.Entry<String, Integer> neighbor : countryGraph.get(currentCountry).entrySet()) {
+                String neighborCountry = neighbor.getKey(); // Extract 'official' adjacent country name.
+                int tempDistance = neighbor.getValue(); // Extract distance to adjacent country.
+
+                // Update distance through newly visited country
+                int updatedDistance = distanceGraph.get(currentCountry) + tempDistance;
+
+                if (updatedDistance < distanceGraph.get(neighborCountry)) { // Compare distances when country is visited
+                    distanceGraph.put(neighborCountry, updatedDistance); // Store minimum distance
+
+                    previousCountry.put(neighborCountry, currentCountry); // Adjust path
+                }
+            }
+        }
+
+        // Calculate total distance using the shortest travel path
+        List<String> shortestPath = new ArrayList<>(); //
+        String curr = country2;
+        while (!curr.equals(country1)) { // Traverse backwards
+            shortestPath.add(0, curr);
+            curr = previousCountry.get(curr);
+        }
+        shortestPath.add(0, country1); // Add the country 1 at the end of loop
+
+        int totalDistance = 0;
+        for (int i = 0; i < shortestPath.size() - 1; i++) {
+            totalDistance += countryGraph.get(shortestPath.get(i)).get(shortestPath.get(i + 1)); // Sum distances between each countries capitals
+        }
+
+        return totalDistance; // Return total distance traveled
+    }
+
+    /**
+     * Method finds the adjacent country with minimum distance between capitals
+     * @param distances Hashmap of country and the distance to its capital
+     * @param visited Map of visited countries (nodes)
+     * @return String adjacent country with the shortest distance to capital
+     */
+    private String getMinDistance(Map<String, Integer> distances, Set<String> visited) {
+        String minDistanceCountry = null;
+        int minDistance = Integer.MAX_VALUE; // Set default distance
+
+        // Loop through adjacent counties in input Hashmap
+        for (Map.Entry<String, Integer> entry : distances.entrySet()) {
+            if (!visited.contains(entry.getKey()) && entry.getValue() < minDistance) { // Country has not been visited and had a shorter distance between capitals
+                minDistance = entry.getValue(); // Update minimum distance between capitals
+                minDistanceCountry = entry.getKey(); // Update country with minimum distance between capitals
+            }
+        }
+        return minDistanceCountry; // Return adjacent country with the shortest distance to capital
     }
 
     /**
@@ -345,9 +420,11 @@ public class IRoadTrip {
      */
     public static void main (String[] args){
         IRoadTrip a3 = new IRoadTrip(args);
-        a3.getDistance("USF", "My House"); // TEST
-        a3.getDistance("France", "Spain"); // TEST
-        a3.getDistance("Canada", "Panama"); // TEST
+
+        System.out.println(a3.getDistance("USF", "My House")); // TEST
+        System.out.println(a3.getDistance("France", "Spain")); // TEST
+        System.out.println(a3.getDistance("Canada", "Panama")); // TEST
+
         a3.acceptUserInput();
     }
 }
