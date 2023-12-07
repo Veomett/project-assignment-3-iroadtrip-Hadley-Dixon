@@ -3,10 +3,11 @@
 import java.util.*;
 import java.io.*;
 
-// TODO: Javadoc
+/**
+ *  IRoadTrip class implements the shortest path trip between two countries. Sources available in README.md
+ */
 public class IRoadTrip {
 
-    // See source (1) in README.md
     private Map<String, Map<String, Integer>> countryGraph; // Graph of adjacent countries
     private Map<String, String> countryNameMap; // Map of country names
 
@@ -20,7 +21,6 @@ public class IRoadTrip {
             System.exit(1);
         }
 
-        // Valid input
         countryGraph = new HashMap<>(); // Initialize adjacent country graph
         countryNameMap = new HashMap<>(); // Initialize map of country names
 
@@ -115,6 +115,10 @@ public class IRoadTrip {
                 }
             }
 
+            System.out.println("If 3-letter country ID from 2020 is present in 'state_name.tsv', country is added to map of valid country names");
+            System.out.println(countryNameMap);
+            System.out.println();
+
         } catch (Exception exception) {
             System.err.println(exception.getMessage());
             System.exit(1);
@@ -145,6 +149,10 @@ public class IRoadTrip {
                     }
                 }
             }
+
+            System.out.println("If country in 'borders.txt' is present in the map of valid country names, country is added to a graph of adjacent countries (default distance between capitals is 0)");
+            System.out.println(countryGraph);
+            System.out.println();
 
         } catch (Exception exception) { // See source (3) in README.md
             System.err.println(exception.getMessage());
@@ -192,6 +200,10 @@ public class IRoadTrip {
                 }
             }
 
+            System.out.println("If distance data is present in 'capdist.csv', distance between capitals of adjacent countries is adjusted in graph");
+            System.out.println(countryGraph);
+            System.out.println();
+
         } catch (Exception exception) {
             System.err.println(exception.getMessage());
             System.exit(1);
@@ -199,97 +211,16 @@ public class IRoadTrip {
     }
 
     // TODO: Javadoc
-    // TODO: getDistance
     public int getDistance(String country1, String country2) {
-        // Implement Dijkstra's algorithm here
-        if (!countryGraph.containsKey(country1) || !countryGraph.containsKey(country2)) {
-            return -1; // Either country does not exist in the graph
-        }
-
-        Map<String, Integer> distances = new HashMap<>();
-        Set<String> visited = new HashSet<>();
-        PriorityQueue<String> priorityQueue = new PriorityQueue<>(Comparator.comparingInt(distances::get));
-
-        for (String country : countryGraph.keySet()) {
-            distances.put(country, Integer.MAX_VALUE);
-        }
-
-        distances.put(country1, 0);
-        priorityQueue.add(country1);
-
-        while (!priorityQueue.isEmpty()) {
-            String currentCountry = priorityQueue.poll();
-            if (visited.contains(currentCountry)) {
-                continue;
-            }
-
-            visited.add(currentCountry);
-
-            for (Map.Entry<String, Integer> neighbor : countryGraph.get(currentCountry).entrySet()) {
-                String neighborCountry = neighbor.getKey();
-                int newDistance = distances.get(currentCountry) + neighbor.getValue();
-                if (newDistance < distances.get(neighborCountry)) {
-                    distances.put(neighborCountry, newDistance);
-                    priorityQueue.add(neighborCountry);
-                }
-            }
-        }
-
-        return distances.getOrDefault(country2, -1);
+        // TODO: getDistance
+        return -1;
     }
 
-    // TODO: findPath
     // TODO: Javadoc
     public List<String> findPath(String country1, String country2) {
-        // Implement Dijkstra's algorithm here
-        if (!countryGraph.containsKey(country1) || !countryGraph.containsKey(country2)) {
-            return Collections.emptyList(); // Either country does not exist in the graph
-        }
-
-        Map<String, Integer> distances = new HashMap<>();
-        Map<String, String> previous = new HashMap<>();
-        Set<String> visited = new HashSet<>();
-        PriorityQueue<String> priorityQueue = new PriorityQueue<>(Comparator.comparingInt(distances::get));
-
-        for (String country : countryGraph.keySet()) {
-            distances.put(country, Integer.MAX_VALUE);
-        }
-
-        distances.put(country1, 0);
-        priorityQueue.add(country1);
-
-        while (!priorityQueue.isEmpty()) {
-            String currentCountry = priorityQueue.poll();
-            if (visited.contains(currentCountry)) {
-                continue;
-            }
-
-            visited.add(currentCountry);
-
-            for (Map.Entry<String, Integer> neighbor : countryGraph.get(currentCountry).entrySet()) {
-                String neighborCountry = neighbor.getKey();
-                int newDistance = distances.get(currentCountry) + neighbor.getValue();
-                if (newDistance < distances.get(neighborCountry)) {
-                    distances.put(neighborCountry, newDistance);
-                    previous.put(neighborCountry, currentCountry);
-                    priorityQueue.add(neighborCountry);
-                }
-            }
-        }
-
-        List<String> path = new ArrayList<>();
-        String currentCountry = country2;
-
-        while (currentCountry != null) {
-            path.add(currentCountry);
-            currentCountry = previous.get(currentCountry);
-        }
-
-        Collections.reverse(path);
-
-        return path.size() > 1 ? path : Collections.emptyList();
+        // TODO: findPath
+        return null;
     }
-
 
     // TODO: Javadoc
     public void acceptUserInput() {
@@ -307,12 +238,13 @@ public class IRoadTrip {
 
                 if (!countryGraph.containsKey(country1)) {
                     System.out.println("Invalid country name. Please enter a valid country name.");
+                    System.out.println("See README.md for valid country requirements");
                     continue;
                 }
 
                 if (country1.equals("Kosovo") || country1.equals("South Sudan")) {
-                    System.out.println("Valid country in the graph, however no available data in the distance file.");
-                    System.out.println("Please enter a different country name.");
+                    System.out.println("Valid country, but no available distance data.");
+                    System.out.println("Please enter a new country name.");
                     continue;
                 }
 
@@ -325,16 +257,17 @@ public class IRoadTrip {
 
                     if (!countryGraph.containsKey(country2)) {
                         System.out.println("Invalid country name. Please enter a valid country name.");
+                        System.out.println("See README.md for valid country requirements");
                         continue;
                     }
 
                     if (country2.equals("Kosovo") || country2.equals("South Sudan")) {
-                        System.out.println("Valid country in the graph, however no available data in the distance file.");
-                        System.out.println("Please enter a different country name.");
+                        System.out.println("Valid country, but no available distance data.");
+                        System.out.println("Please enter a different new name.");
                         continue;
                     }
 
-                    // Find path between 2 valid countries
+                    /*// Find path between 2 valid countries
                     List<String> travelPath = findPath(country1, country2);
 
                     if (!travelPath.isEmpty()) { // Valid travel path between countries
@@ -350,12 +283,12 @@ public class IRoadTrip {
                         System.out.println("Total distance: " + totalDistance + " km.");
                     } else { // No valid travel path between countries
                         System.out.println("No path found between " + country1 + " and " + country2);
-                    }
+                    }*/
                 }
             }
-        }
-        scan.close(); // Close scanner after the loop
+        } scan.close(); // Close scanner after the loop
     }
+
     /*public void acceptUserInput() {
         Scanner scan = new Scanner(System.in); // See source (6) in README.md
 
@@ -419,6 +352,9 @@ public class IRoadTrip {
     // Main code provided
     public static void main (String[] args){
         IRoadTrip a3 = new IRoadTrip(args);
+        a3.getDistance("USF", "My House");
+        a3.getDistance("France", "Spain");
+        a3.getDistance("Canada", "Panama");
         a3.acceptUserInput();
     }
 }
